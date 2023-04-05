@@ -1,0 +1,54 @@
+FROM ubuntu:22.04
+
+RUN if [ -n "$HTTP_PROXY" ] ; then  echo "Acquire::http::Proxy \"$HTTP_PROXY\";" >  /etc/apt/apt.conf; fi
+
+# Build and install igt for Arc and iGPU. Note although igt works for Flex, xpumcli is officially supported for Flex monitoring
+RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+    build-essential \
+    wget \
+    gpg-agent \
+    ca-certificates \
+    git \
+    cmake  \
+    libunwind-dev \
+    libgsl-dev \
+    libasound2-dev \
+    libxmlrpc-core-c3-dev \
+    libjson-c-dev \
+    libcurl4-openssl-dev \
+    python3-docutils \
+    valgrind \
+    peg \
+    libdrm-intel1 \
+    pkg-config libdrm-dev libkmod-dev libprocps-dev libdw-dev libpixman-1-dev libcairo-dev libudev-dev flex bison \
+    meson && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+WORKDIR /igt
+## Not compatible with Ubuntu 22.04 and meson version: 0.61.2 tag: igt-gpu-tools-1.26 vs. latest master commit 59e3bf83
+RUN git config --global http.proxy $HTTP_PROXY; git clone https://github.com/freedesktop/xorg-intel-gpu-tools.git; cd xorg-intel-gpu-tools; git checkout 59e3bf83f6bae0918276f880f969a10d279c657a
+
+## JSON output: /usr/local/bin/intel_gpu_top -d pci:card=$1 -J 
+RUN cd  xorg-intel-gpu-tools; meson build; ninja -C build; cd build; ninja install
+
+
+# Build and install telegraf/influxdb: Reference: https://docs.influxdata.com/telegraf/v1.21/introduction/installation/
+WORKDIR ./opt/intel-gpu-telegraf
+
+RUN \
+## influxdata-archive_compat.key GPG Fingerprint: 9D539D90D3328DC7D6C8D3B9D8FF8E1F7DF8B07E
+ wget -q https://repos.influxdata.com/influxdata-archive_compat.key; \
+ echo '393e8779c89ac8d958f81f942f9ad7fb82a25e133faddaf92e15b16e6ac9ce4c influxdata-archive_compat.key' | sha256sum -c && cat influxdata-archive_compat.key | gpg --dearmor | sudo tee /etc/apt/trusted.gpg.d/influxdata-archive_compat.gpg > /dev/null; \
+echo 'deb [signed-by=/etc/apt/trusted.gpg.d/influxdata-archive_compat.gpg] https://repos.influxdata.com/debian stable main' | tee /etc/apt/sources.list.d/influxdata.list
+
+RUN apt-get update -y || true; DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends telegraf \
+ && \
+ apt-get clean && \
+ rm -rf /var/lib/apt/lists/*
+
+COPY ./opt/intel-gpu-telegraf /opt/intel-gpu-telegraf
+RUN telegraf --sample-config > telegraf-sample.conf
+
+CMD ["/usr/bin/telegraf", "--config", "/opt/intel-gpu-telegraf/telegraf.conf"]
+
