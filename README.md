@@ -19,3 +19,13 @@ Credit: This repository was original forked from  https://github.com/brianmiller
  
   `./docker-run.sh`
   
+  ### Start Dashboard
+  
+  Open a browser to http://127.0.0.1:8086 and login to Grafana using username: telegraf password: p@ssw8rd
+  
+  After logging in goto Dashboards and import the intel_12th_gen._core_i7_and_arc_a770m_telemetry.json file.
+  
+  The below dashboard will be available after imported.
+  
+  <img src="https://github.com/gsilva2016/docker-intel-gpu-telegraf/blob/master/grafana-serpentcanyon-snapshot.png" />
+  
