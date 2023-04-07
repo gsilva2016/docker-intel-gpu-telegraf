@@ -13,7 +13,8 @@ Credit: This repository was original forked from  https://github.com/brianmiller
   
   or
   
-  `./docker-build.sh`
+  `./docker-build.sh` or  for Flex GPU systems execute `IS_FLEX=1 ./docker-build.sh`
+
  
  #### Run Container
  
@@ -23,7 +24,7 @@ Credit: This repository was original forked from  https://github.com/brianmiller
   
   Open a browser to http://127.0.0.1:8086 and login to Grafana using username: telegraf password: p@ssw8rd
   
-  After logging in goto Dashboards and import the intel_12th_gen._core_i7_and_arc_a770m_telemetry.json file.
+  After logging in goto Dashboards and import the intel_12th_gen._core_i7_and_arc_a770m_telemetry.json or intel_xeon_sp_and_flex_140_gpu_telemetry.json for your platform.
   
   The below dashboard will be available after imported.
   
