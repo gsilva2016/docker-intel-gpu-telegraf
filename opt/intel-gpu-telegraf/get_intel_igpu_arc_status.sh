@@ -11,7 +11,7 @@ RENDER_UTIL=$(echo "$JSON"|grep Render/3D/0 -A 1|tail -1|grep busy|cut -d ":" -f
 JSON2=$(/usr/bin/timeout -k 2 2 /usr/local/bin/intel_gpu_top -J -d pci:card=0)
 VIDEO_UTIL2=$(echo "$JSON2"|grep Video/0 -A 1|tail -1|grep busy|cut -d ":" -f2|cut -d "," -f1|cut -d " " -f2)
 VIDEO_UTIL2_2=$(echo "$JSON2"|grep Video/1 -A 1|tail -1|grep busy|cut -d ":" -f2|cut -d "," -f1|cut -d " " -f2)
-RENDER_UTIL2=$(echo "$JSON2"|grep Render/3D/0 -A 1|tail -1|grep busy|cut -d ":" -f2|cut -d "," -f1|cut -d " " -f2)
+RENDER_UTIL2=$(echo "$JSON2"|grep unknown\]/0 -A 1|tail -1|grep busy|cut -d ":" -f2|cut -d "," -f1|cut -d " " -f2)
 
 
 
