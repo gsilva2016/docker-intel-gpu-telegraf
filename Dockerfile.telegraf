@@ -29,10 +29,15 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-ins
 
 WORKDIR /igt
 ## Not compatible with Ubuntu 22.04 and meson version: 0.61.2 tag: igt-gpu-tools-1.26 vs. latest master commit 59e3bf83
-RUN git config --global http.proxy $HTTP_PROXY; git clone https://github.com/freedesktop/xorg-intel-gpu-tools.git; cd xorg-intel-gpu-tools; git checkout 59e3bf83f6bae0918276f880f969a10d279c657a
+# github repo is missing as of 4/24/23...
+#RUN git config --global http.proxy $HTTP_PROXY; git clone https://github.com/freedesktop/xorg-intel-gpu-tools.git; cd xorg-intel-gpu-tools; git checkout 59e3bf83f6bae0918276f880f969a10d279c657a
+
+# Install 1.27.1
+RUN git config --global http.proxy $HTTP_PROXY; git clone https://gitlab.freedesktop.org/drm/igt-gpu-tools.git; cd igt-gpu-tools; git checkout 	2b29e8ac07fbcfadc48b9d60e4d736a6e3b289ab
+#59e3bf83f6bae0918276f880f969a10d279c657a
 
 ## JSON output: /usr/local/bin/intel_gpu_top -d pci:card=$1 -J 
-RUN cd  xorg-intel-gpu-tools; meson build; ninja -C build; cd build; ninja install
+RUN cd  igt-gpu-tools; meson build; ninja -C build; cd build; ninja install
 
 
 # Build and install telegraf/influxdb: Reference: https://docs.influxdata.com/telegraf/v1.21/introduction/installation/
